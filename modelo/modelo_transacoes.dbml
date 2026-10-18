@@ -1,0 +1,76 @@
+// Modelo dimensional: transações de cartão (esquema estrela)
+// Cole este conteúdo no editor do dbdiagram.io (lado esquerdo)
+
+Project transacoes_cartao {
+  database_type: 'PostgreSQL'
+  Note: 'Granularidade da fato: 1 linha = 1 tentativa de autorização de transação'
+}
+
+Table dim_cliente {
+  id_cliente bigint [pk]
+  dat_cadastro date
+  des_uf char(2)
+  des_cidade varchar(100)
+}
+
+Table dim_cartao {
+  id_cartao bigint [pk]
+  des_tipo_cartao varchar(20) [note: 'Crédito ou Débito']
+  dat_emissao date
+  dat_validade date
+  ind_ativo boolean [default: true]
+}
+
+Table dim_bin {
+  cod_bin char(6) [pk, note: '6 primeiros dígitos do PAN']
+  des_bandeira varchar(30)
+  des_emissor varchar(100)
+  des_produto varchar(50)
+  des_tipo_cartao varchar(20)
+}
+
+Table dim_estabelecimento {
+  id_estabelecimento bigint [pk, increment]
+  des_estabelecimento varchar(200) [not null]
+  des_cidade varchar(100)
+  des_uf char(2)
+  des_pais varchar(50)
+}
+
+Table dim_mcc {
+  cod_mcc char(4) [pk]
+  des_mcc varchar(150) [not null]
+  des_categoria varchar(100)
+}
+
+Table dim_status_transacao {
+  cod_status_trans varchar(10) [pk]
+  des_status_trans varchar(100) [not null]
+  ind_aprovada boolean [not null]
+}
+
+Table dim_data {
+  id_data integer [pk, note: 'Formato AAAAMMDD']
+  dat_completa date [not null, unique]
+  nr_ano smallint [not null]
+  nr_trimestre smallint [not null]
+  nr_mes smallint [not null]
+  des_mes varchar(15) [not null]
+  nr_dia smallint [not null]
+  nr_dia_semana smallint [not null, note: '0 = domingo']
+  des_dia_semana varchar(15) [not null]
+  ind_fim_semana boolean [not null]
+}
+
+Table fato_transacao {
+  id_transacao varchar(50) [pk, note: 'Dimensão degenerada']
+  id_cliente bigint [not null, ref: > dim_cliente.id_cliente]
+  id_cartao bigint [not null, ref: > dim_cartao.id_cartao]
+  cod_bin char(6) [ref: > dim_bin.cod_bin]
+  id_estabelecimento bigint [ref: > dim_estabelecimento.id_estabelecimento]
+  cod_mcc char(4) [ref: > dim_mcc.cod_mcc]
+  cod_status_trans varchar(10) [not null, ref: > dim_status_transacao.cod_status_trans]
+  dat_transacao timestamp [not null, note: 'Com hora, minuto e segundo']
+  id_data integer [not null, ref: > dim_data.id_data, note: 'Data no formato AAAAMMDD']
+  valor_transacao numeric(15,2) [not null]
+}
