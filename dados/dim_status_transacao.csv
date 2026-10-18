@@ -1,0 +1,11 @@
+cod_status_trans,des_status_trans,ind_aprovada
+00,Aprovada,true
+05,Negada - Não autorizada pelo emissor,false
+14,Negada - Cartão inválido,false
+51,Negada - Limite Indisponível,false
+54,Negada - Cartão vencido,false
+55,Negada - Senha incorreta,false
+57,Negada - Transação não permitida,false
+59,Negada - Suspeita de fraude,false
+62,Negada - Cartão restrito,false
+91,Negada - Emissor indisponível,false
